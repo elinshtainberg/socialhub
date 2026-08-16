@@ -270,6 +270,45 @@ export default function TodayPage() {
             </div>
           )}
 
+          {/* Recurring content */}
+          {recurringItems.length > 0 && (
+            <div className="rounded-2xl overflow-hidden"
+              style={{ background: "#FEFDFB", boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04)" }}>
+              <div className="px-4 py-3 border-b border-[rgba(28,18,8,0.05)]">
+                <span className="text-[11px] font-medium text-t-4 uppercase tracking-[0.10em]">תוכן קבוע להיום</span>
+              </div>
+              {recurringItems.map((item, i, arr) => {
+                const done = recurringDone[item.id];
+                return (
+                  <div key={item.id}>
+                    <div className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-black/[0.02] ${done ? "opacity-40" : ""}`}>
+                      <button onClick={() => {
+                        const next = !done;
+                        if (next) markDone(item.id, todayISO()); else unmarkDone(item.id, todayISO());
+                        setRecurringDone(prev => ({ ...prev, [item.id]: next }));
+                      }}
+                        className={`w-[18px] h-[18px] rounded-full border shrink-0 flex items-center justify-center transition-all
+                          ${done ? "bg-[#111110] border-[#111110]" : "border-black/20 hover:border-black/40"}`}>
+                        {done && <span className="text-white text-[8px] leading-none">✓</span>}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <Link href={`/clients/${item.clientId}`} onClick={e => e.stopPropagation()}
+                            className="text-[13px] font-medium text-t-1 hover:underline">{item.clientName}</Link>
+                          <span className="text-[13px] font-light text-t-2">{item.label}</span>
+                        </div>
+                        <p className="text-[11px] text-t-4 mt-0.5">
+                          {item.platform !== "all" ? `${item.platform} · ` : ""}{item.contentType}
+                        </p>
+                      </div>
+                    </div>
+                    {i < arr.length - 1 && <div className="mx-4 border-b border-[rgba(28,18,8,0.05)]" />}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {/* Scheduled content for today (from client calendars) */}
           {todayContent.length > 0 && (
             <div className="rounded-2xl overflow-hidden"
@@ -305,45 +344,6 @@ export default function TodayPage() {
                           </span>
                           {item.title && <span className="text-[13px] font-light text-t-3">{item.title}</span>}
                         </div>
-                      </div>
-                    </div>
-                    {i < arr.length - 1 && <div className="mx-4 border-b border-[rgba(28,18,8,0.05)]" />}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Recurring content */}
-          {recurringItems.length > 0 && (
-            <div className="rounded-2xl overflow-hidden"
-              style={{ background: "#FEFDFB", boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04)" }}>
-              <div className="px-4 py-3 border-b border-[rgba(28,18,8,0.05)]">
-                <span className="text-[11px] font-medium text-t-4 uppercase tracking-[0.10em]">תוכן קבוע להיום</span>
-              </div>
-              {recurringItems.map((item, i, arr) => {
-                const done = recurringDone[item.id];
-                return (
-                  <div key={item.id}>
-                    <div className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-black/[0.02] ${done ? "opacity-40" : ""}`}>
-                      <button onClick={() => {
-                        const next = !done;
-                        if (next) markDone(item.id, todayISO()); else unmarkDone(item.id, todayISO());
-                        setRecurringDone(prev => ({ ...prev, [item.id]: next }));
-                      }}
-                        className={`w-[18px] h-[18px] rounded-full border shrink-0 flex items-center justify-center transition-all
-                          ${done ? "bg-[#111110] border-[#111110]" : "border-black/20 hover:border-black/40"}`}>
-                        {done && <span className="text-white text-[8px] leading-none">✓</span>}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <Link href={`/clients/${item.clientId}`} onClick={e => e.stopPropagation()}
-                            className="text-[13px] font-medium text-t-1 hover:underline">{item.clientName}</Link>
-                          <span className="text-[13px] font-light text-t-2">{item.label}</span>
-                        </div>
-                        <p className="text-[11px] text-t-4 mt-0.5">
-                          {item.platform !== "all" ? `${item.platform} · ` : ""}{item.contentType}
-                        </p>
                       </div>
                     </div>
                     {i < arr.length - 1 && <div className="mx-4 border-b border-[rgba(28,18,8,0.05)]" />}
