@@ -56,7 +56,7 @@ export function DayDetailModal({ open, onClose, dateStr, dateLabel, tasks, calen
         <div className="mb-4 space-y-2">
           <AddTaskTrigger onClick={() => setAddOpen(true)} />
           <TaskModal open={addOpen} onClose={() => setAddOpen(false)} clients={clients}
-            defaultDueDate={dateStr} onCreated={onChanged} />
+            defaultDueDate={dateStr} hideDueDate onCreated={onChanged} />
           {!addCalOpen ? (
             <button onClick={() => setAddCalOpen(true)}
               className="w-full text-right text-sm font-light text-t-3 hover:text-t-1 transition px-1 py-1">

@@ -54,10 +54,10 @@ export function AddTaskTrigger({ variant = "row", label = "הוספת משימה
 // everywhere: title → category (if not locked) → contextual extras.
 // ─────────────────────────────────────────────────────────────────────────
 export function TaskModal({ open, onClose, clients = [], defaultCategory, defaultClientId,
-  defaultDueDate, onCreated }: {
+  defaultDueDate, hideDueDate, onCreated }: {
   open: boolean; onClose: () => void; clients?: Client[];
   defaultCategory?: TaskCategory; defaultClientId?: string;
-  defaultDueDate?: string; onCreated?: () => void;
+  defaultDueDate?: string; hideDueDate?: boolean; onCreated?: () => void;
 }) {
   const [title, setTitle] = useState("");
   const [cat, setCat] = useState<TaskCategory>(defaultCategory ?? "client");
@@ -134,13 +134,15 @@ export function TaskModal({ open, onClose, clients = [], defaultCategory, defaul
           </div>
         )}
 
-        <div>
-          <p className="text-[11px] font-medium mb-1.5 tracking-wide" style={{ color: "#9C8B7A" }}>
-            עד תאריך <span className="font-light opacity-60">(ריק = משימה פתוחה)</span>
-          </p>
-          <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
-            className="px-4 py-2.5 text-sm font-light calm-input" style={{ color: "#5C4C3F", width: "100%" }} />
-        </div>
+        {!hideDueDate && (
+          <div>
+            <p className="text-[11px] font-medium mb-1.5 tracking-wide" style={{ color: "#9C8B7A" }}>
+              עד תאריך <span className="font-light opacity-60">(ריק = משימה פתוחה)</span>
+            </p>
+            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
+              className="px-4 py-2.5 text-sm font-light calm-input" style={{ color: "#5C4C3F", width: "100%" }} />
+          </div>
+        )}
 
         <button type="button" onClick={() => setUrgent((u) => !u)}
           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer"

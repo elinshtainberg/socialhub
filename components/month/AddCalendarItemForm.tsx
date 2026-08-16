@@ -32,7 +32,7 @@ export function AddCalendarItemForm({
   const [startTime, setStartTime] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const showTime = type === "meeting" || type === "shoot" || type === "event";
+  const showTime = type !== "holiday";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
