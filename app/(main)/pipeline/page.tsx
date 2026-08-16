@@ -469,7 +469,7 @@ export default function PipelinePage() {
                         <span className="text-[11px] px-2 py-0.5 rounded-full font-medium" style={{ background: platformColor[item.platform], color: platformText[item.platform] }}>{PLATFORM_LABELS[item.platform]}</span>
                       )}
                     </div>
-                    <button onClick={() => handleDelete(item.id)} className="absolute left-2 top-2 p-1 text-t-4 opacity-0 group-hover:opacity-100 transition"><Trash2 size={12} /></button>
+                    <button onClick={() => removeItem(item.id)} className="absolute left-2 top-2 p-1 text-t-4 opacity-0 group-hover:opacity-100 transition"><Trash2 size={12} /></button>
                   </div>
                 );
               })}
