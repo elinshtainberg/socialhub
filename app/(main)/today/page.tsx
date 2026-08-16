@@ -277,7 +277,7 @@ export default function TodayPage() {
               <div className="px-4 py-3 border-b border-[rgba(28,18,8,0.05)]">
                 <span className="text-[11px] font-medium text-t-4 uppercase tracking-[0.10em]">תוכן קבוע להיום</span>
               </div>
-              {recurringItems.map((item, i, arr) => {
+              {[...recurringItems].sort((a, b) => Number(!!recurringDone[a.id]) - Number(!!recurringDone[b.id])).map((item, i, arr) => {
                 const done = recurringDone[item.id];
                 return (
                   <div key={item.id}>
