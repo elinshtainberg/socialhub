@@ -6,7 +6,7 @@ import { EditCalendarItemModal } from "@/components/month/EditCalendarItemModal"
 import { AddCalendarItemForm } from "@/components/month/AddCalendarItemForm";
 import type { CalendarItem, CalendarItemType, Client, Task } from "@/lib/supabase/types";
 import { dayTagLabel, dayTagColor } from "@/components/month/MonthGrid";
-import { X, Pencil } from "lucide-react";
+import { X, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function DayDetailModal({ open, onClose, dateStr, dateLabel, tasks, calendarItems = [], clients, getRelatedLabel, onChanged }: {
@@ -59,8 +59,9 @@ export function DayDetailModal({ open, onClose, dateStr, dateLabel, tasks, calen
             defaultDueDate={dateStr} hideDueDate onCreated={onChanged} />
           {!addCalOpen ? (
             <button onClick={() => setAddCalOpen(true)}
-              className="w-full text-right text-sm font-light text-t-3 hover:text-t-1 transition px-1 py-1">
-              + פריט יומן חדש
+              className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-light text-t-3 hover:text-t-2 transition-all duration-200"
+              style={{ background: "rgba(255,252,248,0.5)", border: "1px dashed rgba(181,154,127,0.20)" }}>
+              <Plus size={15} /> פריט יומן חדש
             </button>
           ) : (
             <div className="rounded-xl p-3 space-y-2" style={{ background: "rgba(181,154,127,0.06)", border: "1px solid rgba(181,154,127,0.14)" }}>
