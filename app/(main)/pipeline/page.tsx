@@ -464,7 +464,7 @@ export default function PipelinePage() {
                     <p className="text-sm font-medium text-t-1 leading-snug ml-5">{item.title}</p>
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {client && <span className="text-[11px] text-t-3">{client.name}</span>}
-                      {item.content_type && <span className="text-[11px] px-2 py-0.5 rounded-full calm-card text-t-3">{TYPE_LABELS[item.content_type]}</span>}
+                      {item.type && <span className="text-[11px] px-2 py-0.5 rounded-full calm-card text-t-3">{TYPE_LABELS[item.type]}</span>}
                       {item.platform && item.platform !== "general" && (
                         <span className="text-[11px] px-2 py-0.5 rounded-full font-medium" style={{ background: platformColor[item.platform], color: platformText[item.platform] }}>{PLATFORM_LABELS[item.platform]}</span>
                       )}
