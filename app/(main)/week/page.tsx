@@ -91,7 +91,7 @@ export default function WeekPage() {
     getDueToday(clients.map((c) => ({ id: c.id, name: c.name })), d.getDay())
   );
 
-  const { events: googleEvents } = useGoogleCalendarEvents(weekStartStr, weekEndStr);
+  const { events: googleEvents, connected } = useGoogleCalendarEvents(weekStartStr, weekEndStr);
   const allCalendarItems = [...calendarItems, ...googleEvents];
 
   const selectedDayLabel = selectedDate
