@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Calendar, FileSpreadsheet, Kanban, LogOut, Search, User, Users } from "lucide-react";
+import { Calendar, FileSpreadsheet, Kanban, LogOut, Search, Settings, User, Users } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { fetchClients } from "@/lib/queries/clients";
 import { fetchAllContentItems } from "@/lib/queries/content";
@@ -30,7 +30,8 @@ const navGroups: NavGroup[] = [
   {
     label: "אישי",
     items: [
-      { href:"/personal", label:"אישי", icon:User, calendarGroup:false },
+      { href:"/personal",  label:"אישי",    icon:User,     calendarGroup:false },
+      { href:"/settings",  label:"הגדרות",  icon:Settings, calendarGroup:false },
     ],
   },
 ];

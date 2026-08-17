@@ -105,6 +105,19 @@ export default function WeekPage() {
   return (
     <div>
       <CalendarViewSwitcher />
+      {!loading && !connected && (
+        <a href="/api/auth/google/connect"
+          className="flex items-center gap-2.5 px-4 py-2.5 mb-4 rounded-xl text-sm transition"
+          style={{ background: "rgba(66,133,244,0.07)", border: "1px solid rgba(66,133,244,0.18)", color: "#4285F4", textDecoration: "none" }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+            <path d="M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z" stroke="#4285F4" strokeWidth="1.5"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="#4285F4" strokeWidth="1.5" strokeLinecap="round"/>
+            <rect x="7" y="13" width="4" height="4" rx="0.5" fill="#EA4335"/>
+          </svg>
+          <span>חברי Google Calendar לסנכרון אוטומטי של אירועים</span>
+          <span className="mr-auto text-xs opacity-60">חיבור ←</span>
+        </a>
+      )}
       <PageHeader
         title="שבוע"
         subtitle={<>{rangeLabel} · <span style={{ color: "#F97316" }}>{weekOpenCount} משימות פתוחות השבוע</span></>}
