@@ -4,7 +4,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Flame } from "lucide-react";
 import type { Client, Task, TaskCategory } from "@/lib/supabase/types";
-const CONTENT_TYPES = ["פוסט","ריל","סטורי","טיקטוק","אחר"];
+const CONTENT_TYPES = ["פוסט","ריל","סטורי","טיקטוק","הכנת גאנט","אחר"];
 const cats: { value: TaskCategory; label: string }[] = [
   {value:"client",label:"לקוח"},{value:"personal",label:"אישי"},
 ];

@@ -18,6 +18,7 @@ const CONTENT_TYPES = [
   { value: "reel",    label: "ריל" },
   { value: "story",   label: "סטורי" },
   { value: "tiktok",  label: "טיקטוק" },
+  { value: "gantt",   label: "הכנת גאנט" },
   { value: "other",   label: "אחר" },
 ];
 
