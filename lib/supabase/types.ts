@@ -103,6 +103,8 @@ export interface Task {
   // Workout-specific type tag. String (not enum) so new types can be added
   // without a schema migration. Null for all non-workout tasks.
   workout_type: string | null;
+  google_task_id?: string | null;
+  google_task_list_id?: string | null;
 }
 
 export interface ContentItem {
@@ -129,6 +131,8 @@ export interface CalendarItem {
   client_id: string | null;
   project_id: string | null;
   start_time: string | null; // "HH:MM"
+  google_event_id?: string | null;
+  source?: "google"; // marked on items imported from Google Calendar
 }
 
 export interface Project {

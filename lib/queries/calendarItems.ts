@@ -11,6 +11,7 @@ import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { CalendarItem, CalendarItemType } from "@/lib/supabase/types";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
 import { USE_MOCK_DATA, mockCalendarItems } from "@/lib/mockData";
+import { pushCalendarItemToGoogle, deleteGoogleEvent } from "@/lib/google/syncHelpers";
 
 /** Fetch items for a given month. Optionally filter by client. */
 export async function fetchCalendarItemsForMonth(
@@ -118,7 +119,16 @@ export async function createCalendarItem(input: {
     .single();
   if (error) throw error;
   cacheInvalidate("calendar:");
-  return data as CalendarItem;
+  const item = data as CalendarItem;
+  // Best-effort: push to Google Calendar if the user is connected
+  pushCalendarItemToGoogle({
+    id: item.id,
+    title: item.title,
+    date: item.date,
+    startTime: item.start_time,
+    notes: item.notes,
+  });
+  return item;
 }
 
 /** Fetch all calendar items linked to a project, sorted by date. */
@@ -158,7 +168,7 @@ export async function updateCalendarItem(id: string, input: {
   cacheInvalidate("calendar:");
 }
 
-export async function deleteCalendarItem(id: string) {
+export async function deleteCalendarItem(id: string, googleEventId?: string | null) {
   if (USE_MOCK_DATA) {
     const idx = mockCalendarItems.findIndex((i) => i.id === id);
     if (idx !== -1) mockCalendarItems.splice(idx, 1);
@@ -169,4 +179,5 @@ export async function deleteCalendarItem(id: string) {
   const { error } = await supabase.from("calendar_items").delete().eq("id", id);
   if (error) throw error;
   cacheInvalidate("calendar:");
+  if (googleEventId) deleteGoogleEvent(googleEventId);
 }

@@ -57,13 +57,22 @@ export function DayColumn({ label, dateNum, isToday, isSelected, tasks, calendar
 
         {/* Calendar events — color only where it carries meaning */}
         {calendarItems.map(item => {
-          const s = dayTagStyle[item.type] ?? { bg: "rgba(120,113,108,0.12)", color: "#57534E" };
+          const isGoogle = item.source === "google";
+          const s = isGoogle
+            ? { bg: "rgba(66,133,244,0.08)", color: "#4285F4" }
+            : dayTagStyle[item.type] ?? { bg: "rgba(120,113,108,0.12)", color: "#57534E" };
           return (
             <div key={item.id} className="flex items-start gap-1.5 px-1 py-1 rounded-md"
               style={{ background: s.bg }}>
-              <span className="w-1 h-1 rounded-full mt-1.5 shrink-0" style={{ background: s.color }} />
+              {isGoogle ? (
+                <span className="text-[8px] font-bold mt-0.5 shrink-0 leading-none px-0.5 rounded"
+                  style={{ color: "#fff", background: "#4285F4" }}>G</span>
+              ) : (
+                <span className="w-1 h-1 rounded-full mt-1.5 shrink-0" style={{ background: s.color }} />
+              )}
               <span className="text-[10px] font-semibold leading-snug truncate" style={{ color: s.color }}>
-                {dayTagLabel[item.type] ?? item.type} · {item.title}
+                {!isGoogle && (dayTagLabel[item.type] ?? item.type) + " · "}
+                {item.title}
                 {item.start_time ? ` · ${item.start_time}` : ""}
               </span>
             </div>

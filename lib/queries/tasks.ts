@@ -3,6 +3,7 @@ import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { Task, TaskCategory, TaskPriority } from "@/lib/supabase/types";
 import { USE_MOCK_DATA, mockTasks } from "@/lib/mockData";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
+import { pushTaskToGoogle, deleteGoogleTask } from "@/lib/google/syncHelpers";
 
 export async function fetchTasks(filters?: {
   category?: TaskCategory;
@@ -101,7 +102,10 @@ export async function createTask(input: {
 
   if (error) throw error;
   cacheInvalidate("tasks:");
-  return data as Task;
+  const task = data as Task;
+  // Best-effort: push to Google Tasks if the user is connected
+  pushTaskToGoogle({ id: task.id, title: task.title, dueDate: task.due_date, notes: task.notes });
+  return task;
 }
 
 export async function updateTaskStatus(id: string, status: Task["status"]) {
@@ -161,7 +165,10 @@ export async function updateTask(
   cacheInvalidate("tasks:");
 }
 
-export async function deleteTask(id: string) {
+export async function deleteTask(
+  id: string,
+  opts?: { googleTaskId?: string | null; googleTaskListId?: string | null }
+) {
   if (USE_MOCK_DATA) {
     const idx = mockTasks.findIndex((t) => t.id === id);
     if (idx !== -1) mockTasks.splice(idx, 1);
@@ -171,6 +178,9 @@ export async function deleteTask(id: string) {
   const { error } = await supabase.from("tasks").delete().eq("id", id);
   if (error) throw error;
   cacheInvalidate("tasks:");
+  if (opts?.googleTaskId && opts.googleTaskListId) {
+    deleteGoogleTask(opts.googleTaskId, opts.googleTaskListId);
+  }
 }
 
 /** Persist a new sort order for a list of task IDs (Today drag-and-drop). */

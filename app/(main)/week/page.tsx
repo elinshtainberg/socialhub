@@ -12,6 +12,7 @@ import { fetchCalendarItemsForRange } from "@/lib/queries/calendarItems";
 import type { CalendarItem, Client, Task } from "@/lib/supabase/types";
 import { localDateStr, parseLocalDate } from "@/lib/utils";
 import { getDueToday, type RecurringItem } from "@/lib/recurring";
+import { useGoogleCalendarEvents } from "@/lib/google/useGoogleSync";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function getWeekStart(d: Date) {
@@ -90,6 +91,9 @@ export default function WeekPage() {
     getDueToday(clients.map((c) => ({ id: c.id, name: c.name })), d.getDay())
   );
 
+  const { events: googleEvents } = useGoogleCalendarEvents(weekStartStr, weekEndStr);
+  const allCalendarItems = [...calendarItems, ...googleEvents];
+
   const selectedDayLabel = selectedDate
     ? parseLocalDate(selectedDate).toLocaleDateString("he-IL", {
         weekday: "long",
@@ -128,7 +132,7 @@ export default function WeekPage() {
         <WeekGrid
           weekDates={weekDates}
           tasks={tasks}
-          calendarItems={calendarItems}
+          calendarItems={allCalendarItems}
           weekRecurring={weekRecurring}
           selectedDate={selectedDate}
           clients={clients}
