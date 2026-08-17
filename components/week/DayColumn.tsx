@@ -1,14 +1,12 @@
-import type { CalendarItem, Task } from "@/lib/supabase/types";
+import type { CalendarItem, Client, Task } from "@/lib/supabase/types";
 import type { RecurringItem } from "@/lib/recurring";
 import { dayTagLabel, dayTagStyle } from "@/components/month/MonthGrid";
+import { colorHex } from "@/lib/clientColors";
 
-const catLabel: Record<string, string> = {
-  client: "לקוח", study: "לימודים", personal: "אישי", workout: "אימונים",
-};
-
-export function DayColumn({ label, dateNum, isToday, isSelected, tasks, calendarItems=[], recurringItems=[], getRelatedLabel, onClick }: {
+export function DayColumn({ label, dateNum, isToday, isSelected, tasks, calendarItems=[], recurringItems=[], clients=[], getRelatedLabel, onClick }: {
   label: string; dateNum: number; isToday: boolean; isSelected?: boolean;
   tasks: Task[]; calendarItems?: CalendarItem[]; recurringItems?: RecurringItem[];
+  clients?: Client[];
   getRelatedLabel?: (t: Task) => string | undefined; onClick?: () => void;
 }) {
   const openCount = tasks.filter(t => t.status !== "done").length;
@@ -78,24 +76,33 @@ export function DayColumn({ label, dateNum, isToday, isSelected, tasks, calendar
             <p className="text-[11px] text-t-4 font-light">אין משימות</p>
           </div>
         ) : (
-          tasks.map(t => (
-            <div key={t.id} className="flex items-start gap-1.5 px-1 py-1.5" style={{ opacity: t.status === "done" ? 0.35 : 1, borderLeft: "2px solid #F97316", paddingLeft: 6 }}>
-              <div className="flex-1 min-w-0">
-              <p className={`text-[12px] font-light leading-snug break-words ${t.status === "done" ? "line-through" : ""} text-t-1`}>
-                {t.title}
-              </p>
-              <div className="flex items-center gap-1 mt-0.5">
-                <span className="text-[10px] text-t-4">{catLabel[t.category]}</span>
-                {getRelatedLabel?.(t) && (
-                  <span className="text-[10px] text-t-4 truncate max-w-[70px]">· {getRelatedLabel(t)}</span>
-                )}
-                {t.priority === "urgent" && t.status !== "done" && (
-                  <span className="text-[10px]" style={{ color: "#C24A1A" }}>· דחוף</span>
-                )}
+          tasks.map(t => {
+            const client = t.category === "client" ? clients.find(c => c.id === t.client_id) : undefined;
+            const accent = client ? colorHex(client.color) : "rgba(28,18,8,0.18)";
+            const accentBg = client ? `${accent}14` : "transparent";
+            return (
+              <div key={t.id} className="rounded-lg py-1.5 px-2"
+                style={{
+                  opacity: t.status === "done" ? 0.35 : 1,
+                  borderRight: `3px solid ${accent}`,
+                  background: accentBg,
+                }}>
+                <p className={`text-[12px] font-light leading-snug break-words ${t.status === "done" ? "line-through" : ""} text-t-1`}>
+                  {t.title}
+                </p>
+                <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                  {client && (
+                    <span className="text-[10px] font-medium truncate max-w-[80px]" style={{ color: accent }}>
+                      {client.name}
+                    </span>
+                  )}
+                  {t.priority === "urgent" && t.status !== "done" && (
+                    <span className="text-[10px]" style={{ color: "#C24A1A" }}>· דחוף</span>
+                  )}
+                </div>
               </div>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </button>

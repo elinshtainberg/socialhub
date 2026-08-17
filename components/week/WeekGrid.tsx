@@ -1,5 +1,5 @@
 import { DayColumn } from "@/components/week/DayColumn";
-import type { CalendarItem, Task } from "@/lib/supabase/types";
+import type { CalendarItem, Client, Task } from "@/lib/supabase/types";
 import type { RecurringItem } from "@/lib/recurring";
 import { localDateStr, todayISO } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ export function WeekGrid({
   calendarItems = [],
   weekRecurring = [],
   selectedDate,
+  clients = [],
   getRelatedLabel,
   onDayClick,
 }: {
@@ -19,6 +20,7 @@ export function WeekGrid({
   calendarItems?: CalendarItem[];
   weekRecurring?: RecurringItem[][];
   selectedDate?: string | null;
+  clients?: Client[];
   getRelatedLabel?: (task: Task) => string | undefined;
   onDayClick?: (dateStr: string) => void;
 }) {
@@ -41,6 +43,7 @@ export function WeekGrid({
             tasks={dayTasks}
             calendarItems={dayItems}
             recurringItems={weekRecurring[i] ?? []}
+            clients={clients}
             getRelatedLabel={getRelatedLabel}
             onClick={() => onDayClick?.(dateStr)}
           />

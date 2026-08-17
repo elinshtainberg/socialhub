@@ -131,6 +131,7 @@ export default function WeekPage() {
           calendarItems={calendarItems}
           weekRecurring={weekRecurring}
           selectedDate={selectedDate}
+          clients={clients}
           getRelatedLabel={relatedLabel}
           onDayClick={setSelectedDate}
         />
