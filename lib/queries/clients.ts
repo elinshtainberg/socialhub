@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/client";
-import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { Client } from "@/lib/supabase/types";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
 import {
@@ -77,6 +76,7 @@ export async function createClientRecord(input: {
   instagram_url?: string | null;
   tiktok_url?: string | null;
   facebook_url?: string | null;
+  linkedin_url?: string | null;
 }) {
   if (USE_MOCK_DATA) {
     const newClient: Client = {
@@ -103,7 +103,7 @@ export async function createClientRecord(input: {
   }
 
   const supabase = createClient();
-  const userId = await getCurrentUserId();
+  const userId = "default-user";
   const { data, error } = await supabase
     .from("clients")
     .insert({
@@ -121,6 +121,7 @@ export async function createClientRecord(input: {
       instagram_url: input.instagram_url ?? null,
       tiktok_url: input.tiktok_url ?? null,
       facebook_url: input.facebook_url ?? null,
+      linkedin_url: input.linkedin_url ?? null,
     })
     .select()
     .single();

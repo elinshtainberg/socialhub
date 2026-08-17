@@ -50,6 +50,7 @@ export interface Client {
   instagram_url: string | null;
   tiktok_url: string | null;
   facebook_url: string | null;
+  linkedin_url: string | null;
   // CRM
   next_action: string | null;
 }

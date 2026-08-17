@@ -10,6 +10,7 @@ const socialStyles: Record<string, { color: string; bg: string; hoverBg: string 
   TikTok:    { color: "#010101", bg: "rgba(1,1,1,0.07)",      hoverBg: "rgba(1,1,1,0.13)" },
   Facebook:  { color: "#1877F2", bg: "rgba(24,119,242,0.08)", hoverBg: "rgba(24,119,242,0.14)" },
   Drive:     { color: "#1A6636", bg: "rgba(26,102,54,0.08)",  hoverBg: "rgba(26,102,54,0.14)" },
+  LinkedIn:  { color: "#0A66C2", bg: "rgba(10,102,194,0.08)", hoverBg: "rgba(10,102,194,0.14)" },
 };
 
 function SocialIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
@@ -54,6 +55,12 @@ const FacebookIcon = () => (
     <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
   </svg>
 );
+const LinkedInIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+    <circle cx="4" cy="4" r="2"/>
+  </svg>
+);
 
 export function ClientHeader({ client, onUpdated }: { client: Client; onUpdated: (u: Partial<Client>) => void }) {
   const [editing, setEditing] = useState(false);
@@ -71,6 +78,7 @@ export function ClientHeader({ client, onUpdated }: { client: Client; onUpdated:
   const [instagramUrl, setInstagramUrl] = useState(client.instagram_url ?? "");
   const [tiktokUrl, setTiktokUrl] = useState(client.tiktok_url ?? "");
   const [facebookUrl, setFacebookUrl] = useState(client.facebook_url ?? "");
+  const [linkedinUrl, setLinkedinUrl] = useState(client.linkedin_url ?? "");
   const [clientColor, setClientColor] = useState(client.color ?? "indigo");
   const [saving, setSaving] = useState(false);
   const isOneTime = client.client_type === "one_time";
@@ -93,6 +101,7 @@ export function ClientHeader({ client, onUpdated }: { client: Client; onUpdated:
       instagram_url: instagramUrl.trim() || null,
       tiktok_url: tiktokUrl.trim() || null,
       facebook_url: facebookUrl.trim() || null,
+      linkedin_url: linkedinUrl.trim() || null,
     };
     try {
       await updateClient(client.id, updates);
@@ -113,6 +122,7 @@ export function ClientHeader({ client, onUpdated }: { client: Client; onUpdated:
     setTaxId(client.company_id ?? "");
     setDriveUrl(client.drive_url ?? ""); setInstagramUrl(client.instagram_url ?? "");
     setTiktokUrl(client.tiktok_url ?? ""); setFacebookUrl(client.facebook_url ?? "");
+    setLinkedinUrl(client.linkedin_url ?? "");
     setEditing(false);
   }
 
@@ -160,6 +170,7 @@ export function ClientHeader({ client, onUpdated }: { client: Client; onUpdated:
                 <input value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="Instagram URL" className={`${inputCls} mt-2`} />
                 <input value={tiktokUrl} onChange={(e) => setTiktokUrl(e.target.value)} placeholder="TikTok URL" className={`${inputCls} mt-2`} />
                 <input value={facebookUrl} onChange={(e) => setFacebookUrl(e.target.value)} placeholder="Facebook URL" className={`${inputCls} mt-2`} />
+                <input value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} placeholder="LinkedIn URL" className={`${inputCls} mt-2`} />
               </div>
               <div className="flex gap-2">
                 <button onClick={save} disabled={saving || !name.trim() || (clientType === "one_time" && !retainer)}
@@ -227,11 +238,12 @@ export function ClientHeader({ client, onUpdated }: { client: Client; onUpdated:
                 )}
               </div>
 
-              {(client.drive_url || client.instagram_url || client.tiktok_url || client.facebook_url) && (
+              {(client.drive_url || client.instagram_url || client.tiktok_url || client.facebook_url || client.linkedin_url) && (
                 <div className="mt-4 pt-4 border-t flex items-center gap-1 flex-wrap" style={{ borderColor: "rgba(181,154,127,0.08)" }}>
                   {client.instagram_url && <SocialIcon href={client.instagram_url} label="Instagram"><InstagramIcon /></SocialIcon>}
                   {client.tiktok_url && <SocialIcon href={client.tiktok_url} label="TikTok"><TikTokIconColored /></SocialIcon>}
                   {client.facebook_url && <SocialIcon href={client.facebook_url} label="Facebook"><FacebookIcon /></SocialIcon>}
+                  {client.linkedin_url && <SocialIcon href={client.linkedin_url} label="LinkedIn"><LinkedInIcon /></SocialIcon>}
                   {client.drive_url && <SocialIcon href={client.drive_url} label="Drive"><DriveIcon /></SocialIcon>}
                 </div>
               )}

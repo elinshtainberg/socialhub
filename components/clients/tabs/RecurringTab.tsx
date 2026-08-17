@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Pencil } from "lucide-react";
-import { loadRules, saveRules, type RecurringRule } from "@/lib/recurring";
+import { Plus, Trash2, Pencil, CalendarClock } from "lucide-react";
+import { loadRules, saveRules, type RecurringRule, loadMonthlyTasks, saveMonthlyTasks, type MonthlyTask } from "@/lib/recurring";
 import type { SocialPlatform, ContentType } from "@/lib/supabase/types";
 
 const DAY_LABELS = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
@@ -33,7 +33,17 @@ export function RecurringTab({ clientId }: { clientId: string }) {
   const [contentType, setContentType] = useState<ContentType>("story");
   const [days, setDays] = useState<number[]>(WEEKDAYS);
 
-  useEffect(() => { setRules(loadRules(clientId)); }, [clientId]);
+  // Monthly tasks
+  const [monthlyTasks, setMonthlyTasks] = useState<MonthlyTask[]>([]);
+  const [addingMonthly, setAddingMonthly] = useState(false);
+  const [editingMonthlyId, setEditingMonthlyId] = useState<string | null>(null);
+  const [monthlyLabel, setMonthlyLabel] = useState("");
+  const [monthDay, setMonthDay] = useState(1);
+
+  useEffect(() => {
+    setRules(loadRules(clientId));
+    setMonthlyTasks(loadMonthlyTasks(clientId));
+  }, [clientId]);
 
   function toggleDay(d: number) {
     setDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d].sort());
@@ -77,6 +87,39 @@ export function RecurringTab({ clientId }: { clientId: string }) {
   }
 
   const dayName = (d: number) => ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"][d];
+
+  function cancelMonthlyForm() {
+    setAddingMonthly(false); setEditingMonthlyId(null);
+    setMonthlyLabel(""); setMonthDay(1);
+  }
+
+  function addMonthlyTask() {
+    if (!monthlyLabel.trim()) return;
+    const next = [...monthlyTasks, { id: `monthly-${Date.now()}`, label: monthlyLabel.trim(), monthDay }];
+    setMonthlyTasks(next); saveMonthlyTasks(clientId, next); cancelMonthlyForm();
+  }
+
+  function saveMonthlyEdit() {
+    if (!monthlyLabel.trim() || !editingMonthlyId) return;
+    const next = monthlyTasks.map(t => t.id === editingMonthlyId ? { ...t, label: monthlyLabel.trim(), monthDay } : t);
+    setMonthlyTasks(next); saveMonthlyTasks(clientId, next); cancelMonthlyForm();
+  }
+
+  function startEditMonthly(task: MonthlyTask) {
+    setEditingMonthlyId(task.id); setMonthlyLabel(task.label); setMonthDay(task.monthDay);
+    setAddingMonthly(false);
+  }
+
+  function deleteMonthlyTask(id: string) {
+    const next = monthlyTasks.filter(t => t.id !== id);
+    setMonthlyTasks(next); saveMonthlyTasks(clientId, next);
+  }
+
+  const ordinalHe = (n: number) => {
+    if (n === 1) return "ה-1 לחודש";
+    if (n === 2) return "ה-2 לחודש";
+    return `ה-${n} לחודש`;
+  };
 
   return (
     <div className="space-y-4">
@@ -171,6 +214,75 @@ export function RecurringTab({ clientId }: { clientId: string }) {
           ))}
         </div>
       )}
+
+      {/* ── Monthly tasks section ── */}
+      <div className="pt-4 border-t" style={{ borderColor: "rgba(181,154,127,0.12)" }}>
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <p className="text-sm font-medium text-t-1 flex items-center gap-1.5">
+              <CalendarClock size={14} className="text-t-3" /> משימות חודשיות
+            </p>
+            <p className="text-xs text-t-4 mt-0.5">מופיעות אוטומטית בעמוד "היום שלי" ביום המתאים בחודש</p>
+          </div>
+          {!addingMonthly && !editingMonthlyId && (
+            <button onClick={() => setAddingMonthly(true)}
+              className="flex items-center gap-1 text-xs text-accent hover:opacity-80 transition font-medium">
+              <Plus size={14} /> משימה חדשה
+            </button>
+          )}
+        </div>
+
+        {/* Monthly add/edit form */}
+        {(addingMonthly || editingMonthlyId) && (
+          <div className="calm-card rounded-2xl p-4 space-y-3 mb-3">
+            <input value={monthlyLabel} onChange={e => setMonthlyLabel(e.target.value)} autoFocus
+              placeholder='תיאור, לדוגמה: "שליחת דוח חודשי"'
+              className="w-full rounded-xl px-3 py-2 text-sm text-t-1 focus:outline-none focus:ring-1 focus:ring-[#9C9078]/40 calm-card" />
+            <div>
+              <p className="text-[11px] text-t-4 mb-1.5">יום בחודש</p>
+              <div className="flex flex-wrap gap-1">
+                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                  <button key={d} type="button" onClick={() => setMonthDay(d)}
+                    className={`w-8 h-8 rounded-lg text-xs font-medium transition ${monthDay === d ? "bg-accent text-white" : "calm-card text-t-3 hover:text-t-1"}`}>
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button onClick={editingMonthlyId ? saveMonthlyEdit : addMonthlyTask}
+                disabled={!monthlyLabel.trim()}
+                className="px-4 py-2 rounded-xl text-xs font-medium bg-accent text-white disabled:opacity-40 hover:opacity-90 transition">
+                {editingMonthlyId ? "שמירה" : "הוספה"}
+              </button>
+              <button onClick={cancelMonthlyForm} className="text-xs text-t-3 hover:text-t-1 px-3 transition">ביטול</button>
+            </div>
+          </div>
+        )}
+
+        {monthlyTasks.length === 0 && !addingMonthly ? (
+          <p className="text-sm text-t-3 text-center py-4">אין משימות חודשיות עדיין</p>
+        ) : (
+          <div className="space-y-2">
+            {monthlyTasks.map(task => (
+              <div key={task.id} className="group calm-card rounded-xl px-4 py-3 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-t-1">{task.label}</p>
+                  <p className="text-[11px] text-t-4 mt-0.5">חוזר כל {ordinalHe(task.monthDay)}</p>
+                </div>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                  <button onClick={() => startEditMonthly(task)} className="p-1.5 text-t-4 hover:text-accent transition">
+                    <Pencil size={13} />
+                  </button>
+                  <button onClick={() => deleteMonthlyTask(task.id)} className="p-1.5 text-t-4 hover:text-[#F87171] transition">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -40,6 +40,41 @@ export function getDueToday(
   return items;
 }
 
+// ─── Monthly tasks ────────────────────────────────────────────────────────────
+
+export type MonthlyTask = {
+  id: string;
+  label: string;
+  monthDay: number; // 1–31
+};
+
+export type MonthlyTaskItem = MonthlyTask & { clientId: string; clientName: string };
+
+const monthlyKey = (clientId: string) => `monthly-tasks-${clientId}`;
+
+export function loadMonthlyTasks(clientId: string): MonthlyTask[] {
+  try { return JSON.parse(localStorage.getItem(monthlyKey(clientId)) ?? "[]"); } catch { return []; }
+}
+
+export function saveMonthlyTasks(clientId: string, tasks: MonthlyTask[]) {
+  localStorage.setItem(monthlyKey(clientId), JSON.stringify(tasks));
+}
+
+export function getMonthlyTasksDueToday(
+  clients: { id: string; name: string }[],
+  dayOfMonth: number
+): MonthlyTaskItem[] {
+  const items: MonthlyTaskItem[] = [];
+  for (const c of clients) {
+    for (const task of loadMonthlyTasks(c.id)) {
+      if (task.monthDay === dayOfMonth) {
+        items.push({ ...task, clientId: c.id, clientName: c.name });
+      }
+    }
+  }
+  return items;
+}
+
 // Mark a recurring item as done for a specific date (YYYY-MM-DD)
 const doneKey = (ruleId: string, date: string) => `rec-done-${ruleId}-${date}`;
 export function markDone(ruleId: string, date: string) {

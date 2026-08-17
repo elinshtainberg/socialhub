@@ -39,6 +39,7 @@ export const mockClients: Client[] = [
     instagram_url: "https://instagram.com/studioLuna",
     tiktok_url: "https://tiktok.com/@studioLuna",
     facebook_url: "https://facebook.com/studioLuna",
+    linkedin_url: null,
     next_action: null,
   },
   {
@@ -58,6 +59,7 @@ export const mockClients: Client[] = [
     instagram_url: "https://instagram.com/nofarClinic",
     tiktok_url: "https://tiktok.com/@nofarClinic",
     facebook_url: null,
+    linkedin_url: null,
     next_action: null,
   },
   {
@@ -77,6 +79,7 @@ export const mockClients: Client[] = [
     instagram_url: null,
     tiktok_url: null,
     facebook_url: null,
+    linkedin_url: null,
     next_action: null,
   },
 ];

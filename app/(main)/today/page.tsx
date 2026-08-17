@@ -9,7 +9,7 @@ import { fetchTasks, reorderTasks } from "@/lib/queries/tasks";
 import { fetchClients } from "@/lib/queries/clients";
 import { fetchCalendarItemsForRange } from "@/lib/queries/calendarItems";
 import type { CalendarItem, Client, Task } from "@/lib/supabase/types";
-import { getDueToday, markDone, unmarkDone, isDone, type RecurringItem } from "@/lib/recurring";
+import { getDueToday, markDone, unmarkDone, isDone, getMonthlyTasksDueToday, type RecurringItem, type MonthlyTaskItem } from "@/lib/recurring";
 import { todayISO, localDateStr } from "@/lib/utils";
 import { Toast } from "@/components/ui/Toast";
 import { Spinner } from "@/components/ui/Spinner";
@@ -52,6 +52,8 @@ export default function TodayPage() {
   }
   const [recurringItems, setRecurringItems] = useState<RecurringItem[]>([]);
   const [recurringDone, setRecurringDone] = useState<Record<string, boolean>>({});
+  const [monthlyItems, setMonthlyItems] = useState<MonthlyTaskItem[]>([]);
+  const [monthlyDone, setMonthlyDone] = useState<Record<string, boolean>>({});
   const [todayContent, setTodayContent] = useState<CalendarItem[]>([]);
   const [contentDone, setContentDone] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
@@ -88,12 +90,20 @@ export default function TodayPage() {
         return merged;
       });
 
-      const dayOfWeek = new Date().getDay();
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const dayOfMonth = now.getDate();
       const due = getDueToday(c.map(cl => ({ id: cl.id, name: cl.name })), dayOfWeek);
       setRecurringItems(due);
       const doneMap: Record<string, boolean> = {};
       due.forEach(item => { doneMap[item.id] = isDone(item.id, todayISO()); });
       setRecurringDone(doneMap);
+
+      const monthlyDue = getMonthlyTasksDueToday(c.map(cl => ({ id: cl.id, name: cl.name })), dayOfMonth);
+      setMonthlyItems(monthlyDue);
+      const monthlyDoneMap: Record<string, boolean> = {};
+      monthlyDue.forEach(item => { monthlyDoneMap[item.id] = isDone(item.id, todayISO()); });
+      setMonthlyDone(monthlyDoneMap);
     } catch (e) {
       console.error("today load error", e);
     } finally {
@@ -300,6 +310,43 @@ export default function TodayPage() {
                         <p className="text-[11px] text-t-4 mt-0.5">
                           {item.platform !== "all" ? `${item.platform} · ` : ""}{item.contentType}
                         </p>
+                      </div>
+                    </div>
+                    {i < arr.length - 1 && <div className="mx-4 border-b border-[rgba(28,18,8,0.05)]" />}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Monthly tasks due today */}
+          {monthlyItems.length > 0 && (
+            <div className="rounded-2xl overflow-hidden"
+              style={{ background: "#FEFDFB", boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04)" }}>
+              <div className="px-4 py-3 border-b border-[rgba(28,18,8,0.05)]">
+                <span className="text-[11px] font-medium text-t-4 uppercase tracking-[0.10em]">משימות חודשיות להיום</span>
+              </div>
+              {[...monthlyItems].sort((a, b) => Number(!!monthlyDone[a.id]) - Number(!!monthlyDone[b.id])).map((item, i, arr) => {
+                const done = monthlyDone[item.id];
+                return (
+                  <div key={item.id}>
+                    <div className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-black/[0.02] ${done ? "opacity-40" : ""}`}>
+                      <button onClick={() => {
+                        const next = !done;
+                        if (next) markDone(item.id, todayISO()); else unmarkDone(item.id, todayISO());
+                        setMonthlyDone(prev => ({ ...prev, [item.id]: next }));
+                      }}
+                        className={`w-[18px] h-[18px] rounded-full border shrink-0 flex items-center justify-center transition-all
+                          ${done ? "bg-[#111110] border-[#111110]" : "border-black/20 hover:border-black/40"}`}>
+                        {done && <span className="text-white text-[8px] leading-none">✓</span>}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <Link href={`/clients/${item.clientId}`} onClick={e => e.stopPropagation()}
+                            className="text-[13px] font-medium text-t-1 hover:underline">{item.clientName}</Link>
+                          <span className="text-[13px] font-light text-t-2">{item.label}</span>
+                        </div>
+                        <p className="text-[11px] text-t-4 mt-0.5">חוזר ביום {item.monthDay} לחודש</p>
                       </div>
                     </div>
                     {i < arr.length - 1 && <div className="mx-4 border-b border-[rgba(28,18,8,0.05)]" />}
