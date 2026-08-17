@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { Invoice } from "@/lib/supabase/types";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
 import { USE_MOCK_DATA, mockInvoices } from "@/lib/mockData";
@@ -58,7 +59,7 @@ export async function upsertInvoice(input: {
     return data as Invoice;
   }
 
-  const userId = "default-user";
+  const userId = await getCurrentUserId();
   const { data, error } = await supabase
     .from("invoices")
     .insert({ ...input, id: undefined, user_id: userId })

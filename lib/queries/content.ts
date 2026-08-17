@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { ContentItem, ContentStatus, Note, SocialPlatform } from "@/lib/supabase/types";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
 import {
@@ -56,7 +57,7 @@ export async function createContentItem(input: {
   }
 
   const supabase = createClient();
-  const userId = "default-user";
+  const userId = await getCurrentUserId();
   const { data, error } = await supabase
     .from("content_items")
     .insert({ user_id: userId, ...input, status: "idea" })
@@ -130,7 +131,7 @@ export async function upsertNote(clientId: string, content: string, existingId?:
   }
 
   const supabase = createClient();
-  const userId = "default-user";
+  const userId = await getCurrentUserId();
   if (existingId) {
     const { error } = await supabase
       .from("notes")

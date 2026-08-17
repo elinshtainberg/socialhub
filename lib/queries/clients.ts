@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { Client } from "@/lib/supabase/types";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
 import {
@@ -103,7 +104,7 @@ export async function createClientRecord(input: {
   }
 
   const supabase = createClient();
-  const userId = "default-user";
+  const userId = await getCurrentUserId();
   const { data, error } = await supabase
     .from("clients")
     .insert({

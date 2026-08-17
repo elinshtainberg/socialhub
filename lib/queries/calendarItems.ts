@@ -7,6 +7,7 @@
 // =============================================================================
 
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { CalendarItem, CalendarItemType } from "@/lib/supabase/types";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
 import { USE_MOCK_DATA, mockCalendarItems } from "@/lib/mockData";
@@ -100,7 +101,7 @@ export async function createCalendarItem(input: {
   }
 
   const supabase = createClient();
-  const userId = "default-user";
+  const userId = await getCurrentUserId();
   const { data, error } = await supabase
     .from("calendar_items")
     .insert({

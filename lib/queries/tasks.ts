@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { getCurrentUserId } from "@/lib/supabase/auth";
 import type { Task, TaskCategory, TaskPriority } from "@/lib/supabase/types";
 import { USE_MOCK_DATA, mockTasks } from "@/lib/mockData";
 import { cachedFetch, cacheInvalidate } from "@/lib/queryCache";
@@ -78,7 +79,7 @@ export async function createTask(input: {
   }
 
   const supabase = createClient();
-  const userId = "default-user";
+  const userId = await getCurrentUserId();
   const { data, error } = await supabase
     .from("tasks")
     .insert({

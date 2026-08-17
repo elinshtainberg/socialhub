@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/client";
 
 export async function getCurrentUserId(): Promise<string> {
   const supabase = createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) throw new Error("Not authenticated");
-  return user.id;
+  // getSession reads from local storage — faster and works reliably in client components
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) throw new Error("Not authenticated");
+  return session.user.id;
 }
