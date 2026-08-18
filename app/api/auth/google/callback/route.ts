@@ -20,13 +20,18 @@ export async function GET(req: NextRequest) {
     const tokens = await exchangeCode(code);
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
 
-    await supabase.from("user_integrations").upsert({
+    const { error: upsertError } = await supabase.from("user_integrations").upsert({
       user_id: user.id,
       provider: "google",
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
       token_expires_at: expiresAt,
     }, { onConflict: "user_id,provider" });
+
+    if (upsertError) {
+      console.error("user_integrations upsert error:", upsertError);
+      return NextResponse.redirect(`${APP_URL}/settings?google=error&reason=${encodeURIComponent(upsertError.message)}`);
+    }
 
     return NextResponse.redirect(`${APP_URL}/settings?google=connected`);
   } catch (e) {
